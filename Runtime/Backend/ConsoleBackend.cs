@@ -1,4 +1,7 @@
-﻿namespace BeastConsole.Backend
+﻿
+using System.Linq;
+
+namespace BeastConsole.Backend
 {
     using System;
     using System.Collections.Generic;
@@ -91,7 +94,14 @@
         internal void CollectAllData()
         {
             // Assembly assembly = Assembly.Load("Assembly-CSharp");
-            Assembly assembly = Assembly.Load("Unity.HotFix");
+            Assembly assembly = null;
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var any = assemblies.Any(m => m.GetName().Name == "Unity.HotFix");
+            if (any)
+            {
+                assembly = Assembly.Load("Unity.HotFix");
+            }
+
             if (assembly == null)
             {
                 assembly = Assembly.Load("Assembly-CSharp");
