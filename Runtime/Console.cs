@@ -38,6 +38,15 @@
             ConsoleGui.OnStateChanged += x => OnStateChanged(x);
         }
 
+        /// <summary>
+        /// 注册类型
+        /// </summary>
+        /// <param name="types"></param>
+        public void RegisterTypes(Type[] types)
+        {
+            m_backend.CollectAllData(types);
+        }
+
         public static void AddCommand(string name, string description, object owner, Action<string[]> callback)
         {
             if (instance != null && instance.m_backend != null)
