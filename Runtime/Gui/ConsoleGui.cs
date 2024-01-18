@@ -21,6 +21,7 @@
             public int MaxConsoleLines = 120;
             public float LinePadding = 10;
             public bool LogHandler = true;
+            public bool AutoRegister = true;
             public GUISkin skin;
 
             public Colors colors = new Colors();

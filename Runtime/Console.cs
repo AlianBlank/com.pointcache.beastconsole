@@ -36,6 +36,18 @@
             m_backend = new ConsoleBackend(consoleOptions.LogHandler, consoleOptions);
             m_gui = new ConsoleGui(m_backend, consoleOptions);
             ConsoleGui.OnStateChanged += x => OnStateChanged(x);
+            if (consoleOptions.AutoRegister)
+            {
+                RegisterTypes();
+            }
+        }
+
+        /// <summary>
+        /// 注册命令
+        /// </summary>
+        public void RegisterTypes()
+        {
+            m_backend.CollectAllData();
         }
 
         /// <summary>
