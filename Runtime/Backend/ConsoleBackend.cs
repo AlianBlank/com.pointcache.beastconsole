@@ -1,6 +1,5 @@
 ﻿namespace BeastConsole.Backend
 {
-
     using System;
     using System.Collections.Generic;
     using System.Reflection;
@@ -31,7 +30,6 @@
     /// </summary>
     internal class ConsoleBackend
     {
-
         internal Action<string> OnWriteLine = delegate { };
         internal Action<string, Command> OnExecutedCommand = delegate { };
 
@@ -81,6 +79,7 @@
             // RegisterCommand("callstack.warning", "display the call stack for the last warning message", LastWarningCallStack);
             // RegisterCommand("callstack.error", "display the call stack for the last error message", LastErrorCallStack);
             // RegisterCommand("callstack.exception", "display the call stack for the last exception message", LastExceptionCallStack);
+
             CollectAllData();
 
             if (handleLogs)
@@ -89,21 +88,34 @@
             }
         }
 
-
-
         internal void CollectAllData()
         {
             // Assembly assembly = Assembly.Load("Assembly-CSharp");
             Assembly assembly = Assembly.Load("Unity.HotFix");
-            
-            var types = assembly.GetTypes();
+            if (assembly == null)
+            {
+                assembly = Assembly.Load("Assembly-CSharp");
+            }
 
+            if (assembly != null)
+            {
+                var types = assembly.GetTypes();
+                CollectAllData(types);
+            }
+        }
+
+        /// <summary>
+        /// 收集标记了ConsoleParseAttribute的类和标记了ConsoleCommandAttribute的方法
+        /// </summary>
+        /// <param name="types">类列表</param>
+        public void CollectAllData(Type[] types)
+        {
             BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
 
             foreach (var type in types)
             {
-                var doparse = type.GetCustomAttribute(typeof(ConsoleParseAttribute));
-                if (doparse == null)
+                var doParse = type.GetCustomAttribute(typeof(ConsoleParseAttribute));
+                if (doParse == null)
                     continue;
 
                 var methods = type.GetMethods(flags);
@@ -121,7 +133,6 @@
 
                 foreach (var field in fields)
                 {
-
                     var atr = field.GetCustomAttribute(typeof(ConsoleVariableAttribute), false);
                     if (atr != null)
                     {
@@ -182,6 +193,7 @@
                 }
             }
         }
+
         // public static void ExecuteFile( string path ) {} //...
         internal void RemoveCommandIfExists(string name, object owner)
         {
@@ -196,13 +208,13 @@
                 }
             }
         }
+
         /// <summary>
         /// Register a console command with an example of usage and a help description
         /// e.g. SmartConsole.RegisterCommand( "echo", "echo <string>", "writes <string> to the console log", SmartConsole.Echo );
         /// </summary>
         internal void RegisterCommand(string name, string helpDescription, object owner, Action<string[]> callback)
         {
-
             m_masterDictionary.TryGetValue(name, out Command comm);
             if (comm != null)
             {
@@ -254,7 +266,6 @@
                 m_variableDictionary.Add(name, returnValue);
                 m_masterDictionary.Add(name, returnValue);
                 m_commandsTrie.Add(new TrieEntry<string>(name, name));
-
             }
         }
 
@@ -296,7 +307,6 @@
 
         internal void UnregisterVariable<T>(string name, object owner)
         {
-
             m_variableDictionary.TryGetValue(name, out Command comm);
             if (comm != null)
             {
@@ -308,6 +318,7 @@
             m_variableDictionary.Remove(name);
             m_masterDictionary.Remove(name);
         }
+
         /// <summary>
         /// Destroy a console variable (so its name can be reused)
         /// </summary>
@@ -325,10 +336,12 @@
             {
                 outputMessage += parameters[i] + " ";
             }
+
             if (outputMessage.EndsWith(" "))
             {
                 outputMessage.Substring(0, outputMessage.Length - 1);
             }
+
             WriteLine(outputMessage);
         }
 
@@ -357,8 +370,8 @@
             {
                 outputStr += cmd.m_name + " - ";
                 outputStr += ConsoleUtility.WrapInColor(greyColor, cmd.m_description) + "\n";
-
             }
+
             WriteLine("All Commands : ");
             WriteLine(outputStr);
         }
@@ -406,10 +419,12 @@
                 }
             }
         }
+
         internal string[] CComParameterSplit(string parameters)
         {
             return parameters.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
         }
+
         internal string[] CComParameterSplit(string parameters, int requiredParameters)
         {
             string[] split = CComParameterSplit(parameters);
@@ -417,6 +432,7 @@
             {
                 WriteLine("Error: not enough parameters for command. Expected " + requiredParameters + " found " + (split.Length - 1));
             }
+
             if (split.Length > (requiredParameters + 1))
             {
                 int extras = ((split.Length - 1) - requiredParameters);
@@ -426,8 +442,10 @@
                     WriteLine("\"" + split[i] + "\"");
                 }
             }
+
             return split;
         }
+
         internal string[] CVarParameterSplit(string parameters)
         {
             string[] split = CComParameterSplit(parameters);
@@ -435,6 +453,7 @@
             {
                 WriteLine("Error: not enough parameters to set or display the value of a console variable.");
             }
+
             if (split.Length > 2)
             {
                 int extras = (split.Length - 3);
@@ -444,6 +463,7 @@
                     WriteLine("\"" + split[i] + "\"");
                 }
             }
+
             return split;
         }
 
@@ -454,11 +474,13 @@
             {
                 return;
             }
+
             int ignoreCount = 0;
             while ((lines[lines.Length - 1 - ignoreCount].Length == 0) && (ignoreCount < lines.Length))
             {
                 ++ignoreCount;
             }
+
             int lineCount = lines.Length - ignoreCount;
             for (int i = 0; i < lineCount; ++i)
             {
@@ -466,7 +488,5 @@
                 WriteLine((i + 1).ToString() + ((i < 9) ? "  " : " ") + lines[i]);
             }
         }
-
-
     }
 }
