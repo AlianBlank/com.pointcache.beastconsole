@@ -20,9 +20,6 @@ BeastConsole is evolution (hopefully) of SmartConsole,
 2. 增加自定义类型列表的支持
 3. 修改为必须手动调用初始化注册
 
-# 当前版本 `1.0.4`
-
-
 # 以下为原内容
 
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
