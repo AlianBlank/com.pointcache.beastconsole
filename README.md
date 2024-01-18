@@ -20,6 +20,10 @@ BeastConsole is evolution (hopefully) of SmartConsole,
 2. 增加自定义类型列表的支持
 3. 修改为必须手动调用初始化注册
 
+# 注意
+
+    预制体对象默认为自动加载。放到场景中时。请将 `Auto Register` 设置为 `false` !!!
+
 # 以下为原内容
 
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
