@@ -83,7 +83,7 @@ namespace BeastConsole.Backend
             // RegisterCommand("callstack.error", "display the call stack for the last error message", LastErrorCallStack);
             // RegisterCommand("callstack.exception", "display the call stack for the last exception message", LastExceptionCallStack);
 
-            CollectAllData();
+            // CollectAllData();
 
             if (handleLogs)
             {
