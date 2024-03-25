@@ -19,7 +19,7 @@ BeastConsole is evolution (hopefully) of SmartConsole,
 1. 增加 `Packages` 的支持
 2. 增加自定义类型列表的支持
 3. 修改为必须手动调用初始化注册
-
+4. 增加移动平台无法输入 Return 按键的问题
 # 注意
 
     预制体对象默认为自动加载。放到场景中时。请将 `Auto Register` 设置为 `false` !!!
