@@ -13,6 +13,7 @@
         public static event System.Action<bool> OnStateChanged = delegate { };
 
         internal Options m_options;
+
         [System.Serializable]
         internal class Options
         {
@@ -48,6 +49,7 @@
         private bool moveToEnd = false;
 
         private int consoleSize;
+
         private float ConsoleHeight
         {
             get
@@ -55,12 +57,11 @@
                 switch (consoleSize)
                 {
                     case 1:
-                    return Screen.height / 3F;
+                        return Screen.height / 3F;
                     case 2:
-                    return Screen.height / 2F;
+                        return Screen.height / 2F;
                     case 3:
-                    return (Screen.height / 2F) + (Screen.height / 4F);
-
+                        return (Screen.height / 2F) + (Screen.height / 4F);
                 }
 
                 return Screen.height / 3F;
@@ -75,6 +76,7 @@
         private Vector2 consoleScrollPosition;
         private float ClosedPosition => -(ConsoleHeight + 20F);
         private Rect inputFieldRect => new Rect(5, rect_console.y + rect_console.height + 5, 400, skin.textField.CalcHeight(new GUIContent("Input"), 50));
+        private Rect enterButtonRect => new Rect(410, rect_console.y + rect_console.height + 2, 100, skin.button.CalcHeight(new GUIContent("Enter"), 120));
         private int currentSuggestionIndex = -1;
         private string currentSuggestion;
         private int currentCommandHistoryIndex = -1;
@@ -158,7 +160,6 @@
                 }
                 else
                 {
-
                     m_lerpTime = 0;
 
                     console_targetPosition = ClosedPosition;
@@ -181,7 +182,6 @@
                 rect_console = new Rect(0, console_currentPosition, rect_console.width, rect_console.height);
 
                 drawConsole = !Mathf.Approximately(console_currentPosition, ClosedPosition);
-
             }
         }
 
@@ -225,18 +225,7 @@
                         e.Use();
                         if (currentSuggestionIndex == -1)
                         {
-                            if (!string.IsNullOrEmpty(console_input))
-                            {
-                                try
-                                {
-                                    HandleInput(console_input);
-                                }
-                                finally
-                                {
-                                    console_input = "";
-                                    ScrollToBottom();
-                                }
-                            }
+                            HandleCmd();
                         }
                         else
                         {
@@ -316,7 +305,6 @@
             {
                 GUI.FocusControl(INPUT_FIELD_NAME);
             }
-
         }
 
         private void SetCmdHistoryItem()
@@ -348,6 +336,34 @@
                 txt.text = console_input;
                 txt.MoveLineEnd();
                 moveToEnd = false;
+            }
+
+            Rect enterButton = enterButtonRect;
+            if (enterButton.width < size.x)
+            {
+                enterButton.width = 100;
+            }
+
+            bool isEnter = GUI.Button(enterButton, "Enter");
+            if (isEnter)
+            {
+                HandleCmd();
+            }
+        }
+
+        private void HandleCmd()
+        {
+            if (!string.IsNullOrEmpty(console_input))
+            {
+                try
+                {
+                    HandleInput(console_input);
+                }
+                finally
+                {
+                    console_input = "";
+                    ScrollToBottom();
+                }
             }
         }
 
@@ -450,7 +466,6 @@
             Rect viewRect = new Rect(historyRect.x, historyRect.y, historyRect.width - 10, totalHeight);
 
 
-
             consoleScrollPosition = GUI.BeginScrollView(historyRect, consoleScrollPosition, viewRect);
             {
                 float currentYPos = (historyRect.height > viewRect.height ? historyRect.height : viewRect.height);
@@ -470,7 +485,6 @@
                 }
             }
             GUI.EndScrollView();
-
         }
 
 
@@ -510,6 +524,7 @@
                 var cmd = list[i];
                 totalHeight += CalcHeightForLine(cmd);
             }
+
             return totalHeight;
         }
 
@@ -517,8 +532,6 @@
         {
             m_backend.ExecuteLine(text);
         }
-
-
 
 
         public static Rect RectWithPadding(Rect rect, int padding)
@@ -532,8 +545,6 @@
         }
 
 
-
-
         private void AutoComplete(string input)
         {
             string[] lookup = m_backend.CComParameterSplit(input);
@@ -542,6 +553,7 @@
                 // don't auto complete if we have typed any parameters so far or nothing at all...
                 return;
             }
+
             Command nearestMatch = m_backend.m_masterDictionary.AutoCompleteLookup(lookup[0]);
             // only complete to the next dot if there is one present in the completion string which
             // we don't already have in the lookup string
@@ -549,13 +561,14 @@
             do
             {
                 dotIndex = nearestMatch.m_name.IndexOf(".", dotIndex + 1);
-            }
-            while ((dotIndex > 0) && (dotIndex < lookup[0].Length));
+            } while ((dotIndex > 0) && (dotIndex < lookup[0].Length));
+
             string insertion = nearestMatch.m_name;
             if (dotIndex >= 0)
             {
                 insertion = nearestMatch.m_name.Substring(0, dotIndex + 1);
             }
+
             if (insertion.Length < input.Length)
             {
                 //do
@@ -579,6 +592,7 @@
             {
                 console_input = insertion;
             }
+
             if (insertion[insertion.Length - 1] != '.')
                 console_input = insertion;
         }
